@@ -13,7 +13,7 @@ A fun and classic **Snake Game** built using **HTML**, **CSS**, and **JavaScript
 ## 🚀 Live Demo
 
 > [Add your GitHub Pages or Netlify link here]  
-> Example: https://.github.io/snake-game/
+> Example: https://sivabalan-cmd.github.io/Simple-Snake-Game/
 
 ## 📸 Screenshot
 
