@@ -1,130 +1,149 @@
+const gameBoard = document.getElementById('gameBoard');
+const context = gameBoard.getContext('2d');
+const scoreText = document.getElementById('scoreVal');
 
-const gameboard=document.getElementById("gameboard");
-const width=gameboard.width;
-const height=gameboard.height;
-const scoretext=document.getElementById("scoreval")
-const UNIT=25; //unit be a factor of width and height
+const WIDTH = gameBoard.width;
+const HEIGHT = gameBoard.height; 
+const UNIT = 25;
+
 let foodX;
 let foodY;
-let xvel=25;
-let yvel=0;
-let score=0;
+let xVel = 25;
+let yVel = 0;
+let score = 0;
+let active=true;
+let started = false;
+let paused = false;
 
-let snake=[
+let snake = [
     {x:UNIT*3,y:0},
     {x:UNIT*2,y:0},
     {x:UNIT,y:0},
     {x:0,y:0}
-]
-window.addEventListener('keydown',keypress)
+];
+window.addEventListener('keydown',keyPress);
+startGame();
 
-const context=gameboard.getContext('2d');
-startgame();
-function startgame(){
-    context.fillStyle='#212121';
-    context.fillRect(0,0,width,height)//to fill color from(x,y,width,height)
-    
-//TO DISPLAY FOOD
-createfood();
-displayfood();//calling functons
-drawSnake();
-movesnake();
-clearboard();
-nextick();
+function startGame(){
+    context.fillStyle = '#212121';
+    //fillRect(xStart,yStart,width,height)
+    context.fillRect(0,0,WIDTH,HEIGHT);
+    createFood();
+    displayFood();
+    drawSnake();
 }
-function clearboard()
-{
-    context.fillstyle='#212121';
-    context.fillRect(0,0,width,height); 
-}
-function createfood()
-{
-    foodX=Math.floor(Math.random()*width/UNIT)*UNIT
-    foodY=Math.floor(Math.random()*height/UNIT)*UNIT
-    
 
+function clearBoard(){
+    context.fillStyle = '#212121';
+    //fillRect(xStart,yStart,width,height)
+    context.fillRect(0,0,WIDTH,HEIGHT);
 }
-function displayfood()
-{
-    context.fillStyle='red';
-    context.fillRect(foodX,foodY,UNIT,UNIT);
-}
-function drawSnake()
-{
-context.fillStyle="aqua";
-context.strokeStyle="#212121"
-snake.forEach((snakepart) => {
-    context.fillRect(snakepart.x,snakepart.y,UNIT,UNIT)
-    context.strokeRect(snakepart.x,snakepart.y,UNIT,UNIT)
-    
-});
 
+function createFood(){
+    foodX = Math.floor(Math.random()*WIDTH/UNIT)*UNIT;
+    foodY = Math.floor(Math.random()*HEIGHT/UNIT)*UNIT;
 }
-function movesnake()
-{
-    const head={x:snake[0].x+xvel,
-                 y:snake[0].y+yvel}
+
+function displayFood(){
+    context.fillStyle = 'red';
+    context.fillRect(foodX,foodY,UNIT,UNIT)
+}
+
+function drawSnake(){
+    context.fillStyle = 'aqua';
+    context.strokeStyle = '#212121';
+    snake.forEach((snakePart) => {
+        context.fillRect(snakePart.x,snakePart.y,UNIT,UNIT)
+        context.strokeRect(snakePart.x,snakePart.y,UNIT,UNIT)
+    })
+}
+
+function moveSnake(){
+    const head = {x:snake[0].x+xVel,
+                    y:snake[0].y+yVel}
     snake.unshift(head)
-    if(snake[0].x==foodX&&snake[0].y==foodY)
-        {
-            score+=1;
-            scoretext.textContent=score
-            createfood();
-
-
-
-        }
+    if(snake[0].x==foodX && snake[0].y==foodY){
+        score += 1;
+        scoreText.textContent = score;
+        createFood();
+    }
     else
-    
-    snake.pop()        
+        snake.pop();
 }
 
-
-function nextick()
-{
-    setTimeout(()=>{
-        clearboard();
-        displayfood();
-        drawSnake();
-        movesnake();
-        
-        nextick();
-        
-    },149);
-
-        
-} 
-//KEY CODES
-//LEFT ARROW=37
-//UP ARROW=38
-//RIGHT ARROW=39
-//DOWN ARROW=40
-function keypress(event){
- const LEFT=37
- const UP=38
- const RIGHT=39
- const DOWN=40
-  switch(true){
-    case(event.keyCode==LEFT && xvel!=UNIT):
-    xvel=-UNIT;
-    yvel=0;
-    break;
-    case(event.keyCode==RIGHT &&xvel!=-UNIT):
-    xvel=UNIT;
-    yvel=0;
-    break;
-    case(event.keyCode==UP && yvel!=UNIT):
-    xvel=0;
-    yvel=-UNIT;
-    break;
-    case(event.keyCode==DOWN && yvel!=-UNIT):
-    xvel=0;
-    yvel=UNIT;
-    break;
-    
-
-
-  }
-
+function nextTick(){
+    if(active && !paused){
+        setTimeout(() => {
+            clearBoard();
+            displayFood();
+            moveSnake();
+            drawSnake();
+            checkGameOver();
+            nextTick();
+        }, 200);
+    }
+    else if(!active){
+        clearBoard();
+        context.font = "bold 50px serif";
+        context.fillStyle = "white";
+        context.textAlign = "center";
+        context.fillText("Game Over!!",WIDTH/2,HEIGHT/2)
+    }
 }
 
+function keyPress(event){
+    if(!started){
+        started = true;
+        nextTick();
+    }
+    //pause when space is pressed
+    if(event.keyCode===32){
+        console.log('clicked')
+        if(paused){
+            paused = false;
+            nextTick();
+        }
+        else{
+            paused = true;
+        }
+    }
+    const LEFT = 37
+    const UP = 38
+    const RIGHT = 39
+    const DOWN = 40
+
+    switch(true){
+        //left key pressed and not going right
+        case(event.keyCode==LEFT  && xVel!=UNIT):
+            xVel=-UNIT;
+            yVel = 0;
+            break;
+        //right key pressed and not going left
+        case(event.keyCode==RIGHT && xVel!=-UNIT):
+            xVel=UNIT;
+            yVel=0;
+            break;
+        //Up key pressed and not going down
+        case(event.keyCode==UP && yVel!=UNIT):
+            xVel=0;
+            yVel=-UNIT;
+            break;
+        //down key pressed and not going up
+        case(event.keyCode==DOWN && yVel!=-UNIT):
+            xVel=0;
+            yVel=UNIT;
+            break;
+
+    }
+}
+
+function checkGameOver(){
+    switch(true){
+        case(snake[0].x<0):
+        case(snake[0].x>=WIDTH):
+        case(snake[0].y<0):
+        case(snake[0].y>=HEIGHT):
+            active=false;
+            break;
+    }
+}
