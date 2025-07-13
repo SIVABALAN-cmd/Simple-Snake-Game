@@ -18,7 +18,7 @@ A fun and classic **Snake Game** built using **HTML**, **CSS**, and **JavaScript
 ## 📸 Screenshot
 
 > *(Optional: Add a screenshot of the game UI)*  
-> ![Snake Game Screenshot](snakegame.png)
+> ![Snake Game Screenshot](i1.png)
 
 ## 🛠️ Built With
 
